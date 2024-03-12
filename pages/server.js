@@ -9,6 +9,7 @@ var escape = require('escape-html');
 const server_template = minify(fs.readFileSync('pages/templates/server.html', 'utf-8'));
 
 const text_channel_template = minify(fs.readFileSync('pages/templates/channellist/textchannel.html', 'utf-8'));
+const voice_channel_template = minify(fs.readFileSync('pages/templates/channellist/voicechannel.html', 'utf-8'));
 const category_channel_template = minify(fs.readFileSync('pages/templates/channellist/categorychannel.html', 'utf-8'));
 
 const server_icon_template = minify(fs.readFileSync('pages/templates/server/server_icon.html', 'utf-8'));
@@ -83,7 +84,7 @@ exports.processServer = async function (bot, req, res, args, discordID) {
     const categories = server.channels.cache.filter(channel => channel.type == "GUILD_CATEGORY");
     const categoriesSorted = categories.sort((a, b) => (a.position - b.position));
 
-    let channelsSorted = server.channels.cache.filter(channel => channel.type != "GUILD_CATEGORY" && channel.type != "GUILD_VOICE" && !channel.parent); // Start with lone channels (no category)
+    let channelsSorted = server.channels.cache.filter(channel => channel.type != "GUILD_CATEGORY" && !channel.parent); // Start with lone channels (no category)
     channelsSorted = channelsSorted.sort((a, b) => (a.position - b.position));
 
     categoriesSorted.forEach(function (category) {
@@ -98,6 +99,8 @@ exports.processServer = async function (bot, req, res, args, discordID) {
       if ((isGuest && guestChannels.includes(item.id)) || (member.permissionsIn && member.permissionsIn(item).has("VIEW_CHANNEL", true))) {
         if (item.type == "GUILD_CATEGORY") {
           channelList += category_channel_template.replace("{$CHANNEL_NAME}", escape(item.name));
+        } else if (item.type == "GUILD_VOICE") {
+          channelList += voice_channel_template.replace("{$CHANNEL_NAME}", escape(item.name)).replace("{$CHANNEL_LINK}", "../channels/" + item.id + "#end");
         } else {
           channelList += text_channel_template.replace("{$CHANNEL_NAME}", escape(item.name)).replace("{$CHANNEL_LINK}", "../channels/" + item.id + "#end");
         }
