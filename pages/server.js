@@ -86,9 +86,8 @@ exports.processServer = async function (bot, req, res, args, discordID) {
     let channelsSorted = server.channels.cache.filter(channel => channel.type != "GUILD_CATEGORY" && channel.type != "GUILD_VOICE" && !channel.parent); // Start with lone channels (no category)
     channelsSorted = channelsSorted.sort((a, b) => (a.position - b.position));
 
-    let sortedChannels = []
     categoriesSorted.forEach(function (category) {
-      sortedChannels.push(category);
+      channelsSorted.set(category.id, category);
       channelsSorted = channelsSorted.concat(
         category.children.sort((a, b) => (a.position - b.position))
           .filter(channel => channel.type != "GUILD_VOICE")
