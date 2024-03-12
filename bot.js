@@ -21,7 +21,6 @@ client.on('ready', () => {
 });
 
 client.on('messageCreate', async function (msg) {
-  console.log(msg)
   if (msghistory.has(msg.channel.id) && !(msghistory.get(msg.channel.id).has(msg.id))) {
     msghistory.get(msg.channel.id).set(msg.id, msg);
 
