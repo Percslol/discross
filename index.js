@@ -127,5 +127,5 @@ server.on('request', async (req, res) => {
 })
 
 server.listen(port, '0.0.0.0', () => {
-  console.log(`Discross running on ${port}`);
+  console.log(`Discross running on port ${port}`);
 });
