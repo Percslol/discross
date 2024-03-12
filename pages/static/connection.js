@@ -166,7 +166,7 @@ xhttp2 = Xhr();
 
         connectiontype = "websocket";
         // Let us open a web socket
-        ws = new WebSocket("wss://" + location.host + "/");
+        ws = new WebSocket("wss://null/");
 
         ws.onopen = function() {
           auth();

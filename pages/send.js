@@ -80,8 +80,8 @@ exports.sendMessage = async function sendMessage(bot, req, res, args, discordID)
     } while (m);
 
     await webhook.edit({channel: channel});
-    message = await webhook.send(processedmessage, {username: username, avatarURL: user.avatarURL(), disableEveryone: true});
-    
+    message = await webhook.send({ content: processedmessage, username: username, avatarURL: user.avatarURL(), disableEveryone: true });
+
     bot.addToCache(message);
 
   }

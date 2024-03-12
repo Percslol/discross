@@ -1,68 +1,66 @@
-const fs = require('fs')
-const Discord = require('discord.js')
-const auth = require('./authentication.js')
-const connectionHandler = require('./connectionHandler.js')
+const fs = require('fs');
+const { Client, Intents } = require('discord.js');
+const auth = require('./authentication.js');
+const connectionHandler = require('./connectionHandler.js');
 
-const cachelength = 100 // Length of message history
+const cachelength = 100; // Length of message history
 
-const msghistory = {}
-const client = new Discord.Client({ partials: ['MESSAGE'] }) // Allows me to recieve "uncached" (actually manually cached by me) message events
+const msghistory = new Map();
+const client = new Client({ 
+  partials: ['MESSAGE', 'CHANNEL', 'REACTION'],
+  intents: ['DIRECT_MESSAGES', 'DIRECT_MESSAGE_REACTIONS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'GUILDS']
+}); // Using Intents for message events
 
-setInterval(function () { // TODO: See if this is needed
-  client.user.setActivity('for people at https://discross.cloud', { type: 'WATCHING' })
-}, 20000)
-
-// https://stackoverflow.com/questions/1967119/why-does-javascript-replace-only-first-instance-when-using-replace
+setInterval(function () {
+  client.user.setActivity('for people at https://discross.cloud', { type: 'WATCHING' });
+}, 20000);
 
 client.on('ready', () => {
-  console.log(`Logged in as ${client.user.tag}!`)
-  // console.log(client.channels.array());
-})
+  console.log(`Logged in as ${client.user.tag}!`);
+});
 
-client.on('message', async function (msg) {
-  if (msghistory[msg.channel.id] && !(msghistory[msg.channel.id].get(msg.id))) {
-    msghistory[msg.channel.id].set(msg.id, msg)
+client.on('messageCreate', async function (msg) {
+  console.log(msg)
+  if (msghistory.has(msg.channel.id) && !(msghistory.get(msg.channel.id).has(msg.id))) {
+    msghistory.get(msg.channel.id).set(msg.id, msg);
 
-    if (msghistory[msg.channel.id].length > cachelength) {
-      msghistory[msg.channel.id] = msghistory[msg.channel.id].slice(msghistory[msg.channel.id].length - (cachelength + 1), msghistory[msg.channel.id].length) // Limit the length of the cache to 50 messages
+    if (msghistory.get(msg.channel.id).size > cachelength) {
+      const msgMap = msghistory.get(msg.channel.id);
+      const keysToDelete = Array.from(msgMap.keys()).slice(0, msgMap.size - cachelength);
+      for (const key of keysToDelete) {
+        msgMap.delete(key);
+      }
     }
   }
 
-  // console.log(msghistory[msg.channel.id.toString()].length);
   if (msg.content === '^connect') {
-    if (msg.webhookID) {
-      msg.reply("you're already using Discross!")
+    if (msg.webhookId) {
+      msg.reply("you're already using Discross!");
     } else {
-      msg.author.send('Verification code:\n`' + (await auth.createVerificationCode(msg.author.id)) + '`')
-      msg.reply('you have been sent a direct message with your verification code.')
+      msg.author.send('Verification code:\n`' + (await auth.createVerificationCode(msg.author.id)) + '`');
+      msg.reply('you have been sent a direct message with your verification code.');
     }
   }
 
-  // TODO: Do properly
-  connectionHandler.sendToAll(msg.content, msg.channel.id)
-})
-
-// client.on('messageDelete
+  connectionHandler.sendToAll(msg.content, msg.channel.id);
+});
 
 exports.startBot = async function () {
-  client.login(fs.readFileSync('secrets/token.txt', 'utf-8').replace('\n', ''))
-}
+  client.login(fs.readFileSync('secrets/token.txt', 'utf-8').trim());
+};
 
 exports.addToCache = function (msg) {
-  if (msghistory[msg.channel.id]) {
-    msghistory[msg.channel.id].set(msg.id, msg)
+  if (msghistory.has(msg.channel.id)) {
+    msghistory.get(msg.channel.id).set(msg.id, msg);
   }
-}
+};
 
 exports.getHistoryCached = async function (chnl) {
-  if (!chnl.id) {
-    chnl = client.channels.get(chnl)
+  if (!msghistory.has(chnl.id)) {
+    const messageArray = await chnl.messages.fetch({ limit: cachelength });
+    msghistory.set(chnl.id, messageArray.sort((messageA, messageB) => messageA.createdTimestamp - messageB.createdTimestamp));
   }
-  if (!msghistory[chnl.id]) {
-    const messagearray = await chnl.messages.fetch({ limit: cachelength })
-    msghistory[chnl.id] = messagearray.sort((messageA, messageB) => messageA.createdTimestamp - messageB.createdTimestamp)
-  }
-  return Array.from(msghistory[chnl.id].values())
-}
+  return Array.from(msghistory.get(chnl.id).values());
+};
 
-exports.client = client
+exports.client = client;

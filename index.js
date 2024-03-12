@@ -39,7 +39,7 @@ function strReplace (string, needle, replacement) {
 
 // create a server object:
 const server = http.createServer(options)
-connectionHandler.startWsServer(server)
+// connectionHandler.startWsServer(server)
 
 async function servePage (filename, res, type, textToReplace, replacement) { // textToReplace and replacement allow for dynamic pages (not used anymore as far as I know)
   if (!type) {

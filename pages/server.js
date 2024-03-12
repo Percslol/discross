@@ -78,27 +78,27 @@ exports.processServer = async function (bot, req, res, args, discordID) {
     server = undefined; // Act like it doesn't exist 
   }
 
+  let channelList = "";
   if (server) {
-    categories = server.channels.cache.filter(channel => channel.type == "category");
-    categoriesSorted = categories.sort((a, b) => (a.calculatedPosition - b.calculatedPosition));
+    const categories = server.channels.cache.filter(channel => channel.type == "GUILD_CATEGORY");
+    const categoriesSorted = categories.sort((a, b) => (a.position - b.position));
 
-    channelsSorted = server.channels.cache.filter(channel => channel.type != "category" && channel.type != "voice" && !channel.parent).array(); // Start with lone channels (no category)
-    channelsSorted = channelsSorted.sort((a, b) => (a.calculatedPosition - b.calculatedPosition));
+    let channelsSorted = server.channels.cache.filter(channel => channel.type != "GUILD_CATEGORY" && channel.type != "GUILD_VOICE" && !channel.parent); // Start with lone channels (no category)
+    channelsSorted = channelsSorted.sort((a, b) => (a.position - b.position));
 
-
-    categoriesSorted.forEach(function(category) {
-      channelsSorted.push(category);
+    let sortedChannels = []
+    categoriesSorted.forEach(function (category) {
+      console.log(channelsSorted)
+      sortedChannels.push(category);
       channelsSorted = channelsSorted.concat(
-        category.children.sort((a, b) => (a.calculatedPosition - b.calculatedPosition))
-        .array()
-        .filter(channel => channel.type != "voice")
+        category.children.sort((a, b) => (a.position - b.position))
+          .filter(channel => channel.type != "GUILD_VOICE")
       );
     });
 
-    channelList = "";
-    channelsSorted.forEach(function(item) {
+    channelsSorted.forEach(function (item) {
       if ((isGuest && guestChannels.includes(item.id)) || (member.permissionsIn && member.permissionsIn(item).has("VIEW_CHANNEL", true))) {
-        if (item.type == "category") {
+        if (item.type == "GUILD_CATEGORY") {
           channelList += category_channel_template.replace("{$CHANNEL_NAME}", escape(item.name));
         } else {
           channelList += text_channel_template.replace("{$CHANNEL_NAME}", escape(item.name)).replace("{$CHANNEL_LINK}", "../channels/" + item.id + "#end");
