@@ -12,12 +12,9 @@ const client = new Client({
   intents: ['DIRECT_MESSAGES', 'DIRECT_MESSAGE_REACTIONS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'GUILDS']
 }); // Using Intents for message events
 
-
-client.user.setActivity('for people at https://discross.percs.dev', { type: 'WATCHING' });
-
-
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  client.user.setActivity('for people at https://discross.percs.dev', { type: 'WATCHING' });
 });
 
 client.on('messageCreate', async function (msg) {
