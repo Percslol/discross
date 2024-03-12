@@ -1,10 +1,11 @@
+require('dotenv').config()
 const fs = require('fs')
 const url = require('url')
 const mime = require('mime-types').lookup
 
 const bot = require('./bot.js')
 const connectionHandler = require('./connectionHandler.js')
-
+let port = process.env.PORT || 3000
 const options = {}
 
 try { // Use HTTPS if keys are available
@@ -125,4 +126,6 @@ server.on('request', async (req, res) => {
   }
 })
 
-server.listen(4000)
+server.listen(port, '0.0.0.0', () => {
+  console.log(`Discross running on ${port}`);
+});

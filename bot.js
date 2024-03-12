@@ -1,5 +1,6 @@
+require('dotenv').config()
 const fs = require('fs');
-const { Client, Intents } = require('discord.js');
+const { Client } = require('discord.js');
 const auth = require('./authentication.js');
 const connectionHandler = require('./connectionHandler.js');
 
@@ -11,9 +12,9 @@ const client = new Client({
   intents: ['DIRECT_MESSAGES', 'DIRECT_MESSAGE_REACTIONS', 'GUILD_MESSAGES', 'GUILD_MESSAGE_REACTIONS', 'GUILDS']
 }); // Using Intents for message events
 
-setInterval(function () {
-  client.user.setActivity('for people at https://discross.cloud', { type: 'WATCHING' });
-}, 20000);
+
+client.user.setActivity('for people at https://discross.percs.dev', { type: 'WATCHING' });
+
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
@@ -46,7 +47,7 @@ client.on('messageCreate', async function (msg) {
 });
 
 exports.startBot = async function () {
-  client.login(fs.readFileSync('secrets/token.txt', 'utf-8').trim());
+  client.login(process.env.DISCORD_TOKEN);
 };
 
 exports.addToCache = function (msg) {

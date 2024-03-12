@@ -7,6 +7,7 @@
     "axios": "^0.21.2",
     "bcrypt": "^5.0.0",
     "discord.js": "^13.3.1",
+    "dotenv": "^16.4.5",
     "escape-html": "^1.0.3",
     "he": "^1.2.0",
     "html-minifier": "^4.0.0",
