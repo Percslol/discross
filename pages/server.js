@@ -88,7 +88,6 @@ exports.processServer = async function (bot, req, res, args, discordID) {
 
     let sortedChannels = []
     categoriesSorted.forEach(function (category) {
-      console.log(channelsSorted)
       sortedChannels.push(category);
       channelsSorted = channelsSorted.concat(
         category.children.sort((a, b) => (a.position - b.position))
