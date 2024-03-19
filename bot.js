@@ -14,7 +14,7 @@ const client = new Client({
 
 client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  client.user.setActivity('for people at https://discross.percs.dev', { type: 'WATCHING' });
+  client.user.setActivity('Discross, but better.', { type: 'WATCHING' });
 });
 
 client.on('messageCreate', async function (msg) {
